@@ -37,45 +37,45 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-    private ArrayAdapter<String> mForecastAdapter;
+    //private ArrayAdapter<String> mForecastAdapter;
     private final Context mContext;
 
     public FetchWeatherTask(Context context, ArrayAdapter<String> forecastAdapter) {
         mContext = context;
-        mForecastAdapter = forecastAdapter;
+        //mForecastAdapter = forecastAdapter;
     }
 
     private boolean DEBUG = true;
 
-    private String getReadableDateString(long time){
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
-        Date date = new Date(time);
-        SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
-        return format.format(date).toString();
-    }
+//    private String getReadableDateString(long time){
+//        // Because the API returns a unix timestamp (measured in seconds),
+//        // it must be converted to milliseconds in order to be converted to valid date.
+//        Date date = new Date(time);
+//        SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
+//        return format.format(date).toString();
+//    }
 
-    private String formatHighLows(double high, double low) {
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
-        String unitType = sharedPrefs.getString(
-                mContext.getString(R.string.pref_units_key),
-                mContext.getString(R.string.pref_units_metric));
-
-        if (unitType.equals(mContext.getString(R.string.pref_units_imperial))) {
-            high = (high * 1.8) + 32;
-            low = (low * 1.8) + 32;
-        } else if (!unitType.equals(mContext.getString(R.string.pref_units_metric))) {
-            Log.d(LOG_TAG, "Unit type not found: " + unitType);
-        }
-
-        // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
-    }
+//    private String formatHighLows(double high, double low) {
+//        SharedPreferences sharedPrefs =
+//                PreferenceManager.getDefaultSharedPreferences(mContext);
+//        String unitType = sharedPrefs.getString(
+//                mContext.getString(R.string.pref_units_key),
+//                mContext.getString(R.string.pref_units_metric));
+//
+//        if (unitType.equals(mContext.getString(R.string.pref_units_imperial))) {
+//            high = (high * 1.8) + 32;
+//            low = (low * 1.8) + 32;
+//        } else if (!unitType.equals(mContext.getString(R.string.pref_units_metric))) {
+//            Log.d(LOG_TAG, "Unit type not found: " + unitType);
+//        }
+//
+//        // For presentation, assume the user doesn't care about tenths of a degree.
+//        long roundedHigh = Math.round(high);
+//        long roundedLow = Math.round(low);
+//
+//        String highLowStr = roundedHigh + "/" + roundedLow;
+//        return highLowStr;
+//    }
 
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
         long locationId;
@@ -118,21 +118,21 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         return locationId;
     }
 
-    String[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
-        // return strings to keep UI functional for now
-        String[] resultStrs = new String[cvv.size()];
-        for ( int i = 0; i < cvv.size(); i++ ) {
-            ContentValues weatherValues = cvv.elementAt(i);
-            String highAndLow = formatHighLows(
-                    weatherValues.getAsDouble(WeatherEntry.COLUMN_MAX_TEMP),
-                    weatherValues.getAsDouble(WeatherEntry.COLUMN_MIN_TEMP));
-            resultStrs[i] = getReadableDateString(
-                    weatherValues.getAsLong(WeatherEntry.COLUMN_DATE)) +
-                    " - " + weatherValues.getAsString(WeatherEntry.COLUMN_SHORT_DESC) +
-                    " - " + highAndLow;
-        }
-        return resultStrs;
-    }
+//    String[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
+//        // return strings to keep UI functional for now
+//        String[] resultStrs = new String[cvv.size()];
+//        for ( int i = 0; i < cvv.size(); i++ ) {
+//            ContentValues weatherValues = cvv.elementAt(i);
+//            String highAndLow = formatHighLows(
+//                    weatherValues.getAsDouble(WeatherEntry.COLUMN_MAX_TEMP),
+//                    weatherValues.getAsDouble(WeatherEntry.COLUMN_MIN_TEMP));
+//            resultStrs[i] = getReadableDateString(
+//                    weatherValues.getAsLong(WeatherEntry.COLUMN_DATE)) +
+//                    " - " + weatherValues.getAsString(WeatherEntry.COLUMN_SHORT_DESC) +
+//                    " - " + highAndLow;
+//        }
+//        return resultStrs;
+//    }
 
     private String[] getWeatherDataFromJson(String forecastJsonStr, String locationSetting)
             throws JSONException {
@@ -268,7 +268,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
             Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVVector.size() + " Inserted");
 
-            String[] resultStrs = convertContentValuesToUXFormat(cVVector);
+           // String[] resultStrs = convertContentValuesToUXFormat(cVVector);
             return resultStrs;
 
         } catch (JSONException e) {
@@ -366,24 +366,25 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             }
         }
 
-        try {
-            return getWeatherDataFromJson(forecastJsonStr, locationQuery);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
+//        try {
+//            //return getWeatherDataFromJson(forecastJsonStr, locationQuery);
+//        }
+//        catch (JSONException e) {
+//            Log.e(LOG_TAG, e.getMessage(), e);
+//            e.printStackTrace();
+//        }
         // This will only happen if there was an error getting or parsing the forecast.
         return null;
     }
 
-    @Override
-    protected void onPostExecute(String[] result) {
-        if (result != null && mForecastAdapter != null) {
-            mForecastAdapter.clear();
-            for(String dayForecastStr : result) {
-                mForecastAdapter.add(dayForecastStr);
-            }
-            // New data is back from the server.  Hooray!
-        }
-    }
+   // @Override
+//    protected void onPostExecute(String[] result) {
+//        if (result != null && mForecastAdapter != null) {
+//            mForecastAdapter.clear();
+//            for(String dayForecastStr : result) {
+//                mForecastAdapter.add(dayForecastStr);
+//            }
+//            // New data is back from the server.  Hooray!
+//        }
+//    }
 }
